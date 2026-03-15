@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Isi Survei — UNS Medical Center</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *{font-family:'Plus Jakarta Sans',sans-serif;box-sizing:border-box;}
+    body{background:linear-gradient(135deg,#dbeafe 0%,#e0f2fe 50%,#f0fdf4 100%);min-height:100vh;overflow-x:hidden;}
+    .blob{position:fixed;border-radius:50%;filter:blur(60px);pointer-events:none;z-index:0;}
+
+    .clay-card{background:#fff;border-radius:28px;
+      box-shadow:8px 8px 24px rgba(99,149,210,.22),-2px -2px 8px rgba(255,255,255,.9),
+        inset 3px 3px 8px rgba(255,255,255,.85),inset -3px -3px 8px rgba(180,210,245,.35);
+      border:1.5px solid rgba(255,255,255,.75);}
+    .clay-btn{border-radius:16px;font-weight:700;border:none;cursor:pointer;
+      box-shadow:5px 5px 14px rgba(59,130,246,.35),-1px -1px 5px rgba(255,255,255,.7),
+        inset 2px 2px 5px rgba(255,255,255,.4),inset -2px -2px 5px rgba(37,99,235,.25);
+      transition:all .18s ease;}
+    .clay-btn:hover{transform:translateY(-2px) scale(1.01);}
+    .clay-btn:active{transform:translateY(0) scale(.98);}
+
+    /* Navbar eksklusif survei */
+    .survey-nav{background:linear-gradient(135deg,#1e3a6e,#1e40af);box-shadow:0 4px 20px rgba(30,58,138,.3);}
+    .nav-exit{color:rgba(255,255,255,.8);font-size:.875rem;font-weight:600;padding:.5rem .9rem;
+      border-radius:10px;cursor:pointer;transition:background .15s,color .15s;
+      background:none;border:none;display:flex;align-items:center;gap:6px;}
+    .nav-exit:hover{background:rgba(255,255,255,.14);color:white;}
+
+    /* Progress bar */
+    .progress-track{background:#e8f0fe;border-radius:999px;overflow:hidden;
+      box-shadow:inset 2px 2px 5px rgba(180,210,245,.5),inset -1px -1px 3px rgba(255,255,255,.8);}
+    .progress-fill{height:100%;border-radius:999px;
+      background:linear-gradient(90deg,#3b82f6,#06b6d4);
+      transition:width .5s cubic-bezier(.34,1.2,.64,1), background .4s ease;
+      position:relative;overflow:hidden;}
+    .progress-fill::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;
+      background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);
+      animation:shimmer 2s infinite;}
+    .progress-fill.done{background:linear-gradient(90deg,#22c55e,#16a34a);}
+    .progress-fill.done::after{display:none;}
+    @keyframes shimmer{to{left:200%;}}
+
+    .step-dot{width:10px;height:10px;border-radius:50%;background:#dbeafe;border:2px solid #bfdbfe;transition:all .3s ease;}
+    .step-dot.filled{background:#3b82f6;border-color:#2563eb;transform:scale(1.15);}
+    .step-dot.all-done{background:#22c55e;border-color:#16a34a;}
+
+    /* Form inputs */
+    .clay-select{background:#f1f8ff;border:1.5px solid rgba(147,197,253,.6);border-radius:14px;
+      box-shadow:inset 2px 2px 6px rgba(180,210,245,.4),inset -2px -2px 5px rgba(255,255,255,.85);
+      padding:.75rem 1rem;width:100%;outline:none;font-size:.95rem;font-weight:500;color:#374151;
+      appearance:none;-webkit-appearance:none;transition:border-color .2s,box-shadow .2s;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14' fill='none'%3E%3Cpath d='M3 5L7 9L11 5' stroke='%2394a3b8' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat:no-repeat;background-position:right 1rem center;}
+    .clay-select:focus{border-color:rgba(59,130,246,.6);
+      box-shadow:inset 2px 2px 6px rgba(147,197,253,.5),inset -2px -2px 5px rgba(255,255,255,.9),0 0 0 3px rgba(59,130,246,.12);}
+
+    .clay-textarea{background:#f1f8ff;border:1.5px solid rgba(147,197,253,.6);border-radius:14px;
+      box-shadow:inset 2px 2px 6px rgba(180,210,245,.4),inset -2px -2px 5px rgba(255,255,255,.85);
+      padding:.75rem 1rem;width:100%;outline:none;font-size:.95rem;color:#374151;
+      resize:vertical;transition:border-color .2s,box-shadow .2s;min-height:90px;}
+    .clay-textarea:focus{border-color:rgba(59,130,246,.6);
+      box-shadow:inset 2px 2px 6px rgba(147,197,253,.5),inset -2px -2px 5px rgba(255,255,255,.9),0 0 0 3px rgba(59,130,246,.12);}
+
+    /* Rating boxes — mobile: lebih kecil */
+    .rating-group{display:flex;gap:6px;flex-wrap:wrap;}
+    .rating-label{display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;}
+    .rating-label input[type="radio"]{display:none;}
+    .rating-box{width:46px;height:46px;border-radius:14px;background:#f1f8ff;
+      border:1.5px solid rgba(147,197,253,.5);
+      box-shadow:3px 3px 8px rgba(180,210,245,.35),inset 2px 2px 5px rgba(255,255,255,.8);
+      display:flex;align-items:center;justify-content:center;
+      font-size:1rem;font-weight:800;color:#94a3b8;transition:all .18s ease;}
+    .rating-label:hover .rating-box{background:#dbeafe;border-color:rgba(59,130,246,.4);transform:translateY(-2px) scale(1.05);color:#2563eb;}
+    .rating-label input[type="radio"]:checked ~ .rating-box{
+      background:linear-gradient(135deg,#3b82f6,#2563eb);color:white;border-color:#2563eb;
+      box-shadow:4px 4px 12px rgba(59,130,246,.4),inset 2px 2px 5px rgba(255,255,255,.3);
+      transform:translateY(-2px) scale(1.07);}
+    .rating-num{font-size:.63rem;color:#94a3b8;font-weight:600;}
+    @media(max-width:380px){
+      .rating-box{width:40px;height:40px;font-size:.9rem;}
+      .rating-group{gap:4px;}
+    }
+
+    .q-block{border-bottom:1.5px dashed rgba(186,230,253,.8);padding-bottom:1rem;margin-bottom:1rem;}
+    .q-block:last-of-type{border-bottom:none;margin-bottom:0;}
+    .q-block.answered .q-num-badge{background:linear-gradient(135deg,#22c55e,#16a34a);}
+
+    .section-num{background:linear-gradient(135deg,#3b82f6,#2563eb);color:white;border-radius:10px;
+      width:26px;height:26px;display:flex;align-items:center;justify-content:center;
+      font-size:.72rem;font-weight:800;flex-shrink:0;box-shadow:3px 3px 8px rgba(59,130,246,.3);}
+    .q-num-badge{width:20px;height:20px;border-radius:6px;
+      background:linear-gradient(135deg,#94a3b8,#64748b);color:white;
+      display:flex;align-items:center;justify-content:center;font-size:.6rem;font-weight:800;
+      flex-shrink:0;transition:background .3s;}
+
+    label.field-label{font-size:.83rem;font-weight:600;color:#374151;margin-bottom:4px;display:block;}
+
+    /* Modals */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(7px);
+      z-index:999;display:none;align-items:center;justify-content:center;padding:1rem;}
+    .modal-overlay.show{display:flex;}
+    @keyframes popIn{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:scale(1)}}
+    .pop-in{animation:popIn .32s cubic-bezier(.34,1.56,.64,1) both;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    .fade-up{animation:fadeUp .5s ease both;}
+    .d1{animation-delay:.06s}.d2{animation-delay:.12s}
+
+    @keyframes confettiFall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(70px) rotate(360deg);opacity:0}}
+    .confetti{position:absolute;width:7px;height:7px;border-radius:2px;animation:confettiFall 1.2s ease both;}
+
+    .exit-modal-card{background:#fff;border-radius:28px;
+      box-shadow:8px 8px 28px rgba(239,68,68,.18),-2px -2px 8px rgba(255,255,255,.9),
+        inset 3px 3px 8px rgba(255,255,255,.85),inset -3px -3px 8px rgba(254,202,202,.3);
+      border:1.5px solid rgba(254,202,202,.6);}
+
+    @media(max-width:640px){
+      .clay-card{border-radius:20px;}
+      .survey-nav .text-xs{display:none;}
+    }
+  </style>
+</head>
+<body class="overflow-x-hidden">
+  <div class="blob w-80 h-80 bg-blue-200 opacity-35" style="top:-5rem;left:-5rem;"></div>
+  <div class="blob w-72 h-72 bg-cyan-200 opacity-25" style="bottom:-5rem;right:-5rem;"></div>
+
+  <!-- NAVBAR EKSKLUSIF -->
+  <nav class="survey-nav sticky top-0 z-50">
+    <div class="max-w-3xl mx-auto px-4 sm:px-5 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <img src="https://senirupa.fkip.uns.ac.id/wp-content/uploads/2021/07/logo_putih.png"
+             alt="Logo UNS" class="h-7 sm:h-8 object-contain opacity-90 flex-shrink-0"
+             onerror="this.style.display='none'"/>
+        <div class="min-w-0">
+          <p class="font-extrabold text-white text-xs sm:text-sm leading-tight truncate">UNS Medical Center</p>
+          <p class="text-blue-200 text-xs font-medium hidden sm:block">Sesi Pengisian Survei</p>
+        </div>
+      </div>
+      <button onclick="tryExit()" class="nav-exit flex-shrink-0" aria-label="Keluar dari survei">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        Keluar Survei
+      </button>
+    </div>
+  </nav>
+
+  <main class="max-w-3xl mx-auto px-4 sm:px-5 py-5 sm:py-7 space-y-4 sm:space-y-5 pb-16 relative z-10">
+
+    <!-- HEADER BANNER -->
+    <div class="clay-card fade-up overflow-hidden" style="background:linear-gradient(145deg,#eff6ff,#dbeafe);">
+      <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-5 p-4 sm:p-6">
+        <img src="https://stories.freepiklabs.com/storage/1505/Customer-survey-01.svg"
+             alt="Ilustrasi survei"
+             class="w-28 sm:w-36 h-24 sm:h-32 object-contain drop-shadow-sm flex-shrink-0"/>
+        <div>
+          <h1 class="text-lg sm:text-xl font-extrabold text-gray-800 leading-tight">Formulir Survei Kepuasan</h1>
+          <p class="text-gray-500 text-xs sm:text-sm mt-1 leading-6">Penilaian Anda membantu kami meningkatkan kualitas layanan. Jawab sejujurnya ya! 🙏</p>
+          <div class="flex gap-1.5 sm:gap-2 mt-2 sm:mt-3 flex-wrap">
+            <span class="bg-blue-100 text-blue-700 text-xs font-bold px-2 sm:px-2.5 py-1 rounded-full">📋 4 Pertanyaan</span>
+            <span class="bg-green-100 text-green-700 text-xs font-bold px-2 sm:px-2.5 py-1 rounded-full">⏱ ~2 Menit</span>
+            <span class="bg-purple-100 text-purple-700 text-xs font-bold px-2 sm:px-2.5 py-1 rounded-full">🔒 Anonim</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PROGRESS BAR -->
+    <div class="clay-card p-4 sm:p-5 fade-up d1">
+      <div class="flex items-center justify-between mb-2 sm:mb-3">
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-gray-700 text-xs sm:text-sm">Progress Pengisian</span>
+          <span id="prog-badge" class="hidden bg-green-100 text-green-700 text-xs font-bold px-2.5 py-0.5 rounded-full">🎉 Selesai!</span>
+        </div>
+        <div class="flex items-center gap-1.5 sm:gap-2">
+          <span id="prog-pct" class="font-extrabold text-blue-600 text-lg sm:text-xl transition-all duration-300">0%</span>
+          <span class="text-gray-300 text-xs font-medium" id="prog-frac">(0/5)</span>
+        </div>
+      </div>
+      <div class="progress-track mb-2 sm:mb-3" style="height:12px;">
+        <div id="progress-fill" class="progress-fill" style="width:0%;height:100%;"></div>
+      </div>
+      <div class="flex items-center gap-2 sm:gap-3">
+        <div class="flex gap-1.5 sm:gap-2" id="step-dots">
+          <div class="step-dot" id="dot-k" title="Kategori"></div>
+          <div class="step-dot" id="dot-q1" title="Keramahan"></div>
+          <div class="step-dot" id="dot-q2" title="Kecepatan"></div>
+          <div class="step-dot" id="dot-q3" title="Kebersihan"></div>
+          <div class="step-dot" id="dot-q4" title="Kualitas Medis"></div>
+        </div>
+        <span id="prog-label" class="text-xs text-gray-400 font-medium">Mulai isi form di bawah ↓</span>
+      </div>
+    </div>
+
+    <!-- FORM -->
+    <form id="survey-form" onsubmit="handleSubmit(event)" class="space-y-4 sm:space-y-5 fade-up d2">
+
+      <!-- Identitas -->
+      <div class="clay-card p-5 sm:p-6">
+        <div class="flex items-center gap-2 mb-3 sm:mb-4">
+          <span class="section-num">1</span>
+          <h2 class="font-bold text-gray-700 text-sm sm:text-base">Identitas Responden</h2>
+        </div>
+        <label class="field-label" for="kategori">Kategori Pengunjung <span class="text-red-400">*</span></label>
+        <select id="kategori" class="clay-select" required onchange="updateProgress()">
+          <option value="" disabled selected>-- Pilih Kategori Anda --</option>
+          <option value="Mahasiswa">🎓 Mahasiswa</option>
+          <option value="Dosen">👨‍🏫 Dosen / Tenaga Pengajar</option>
+          <option value="Karyawan">💼 Tenaga Kependidikan</option>
+          <option value="Umum">👥 Masyarakat Umum</option>
+        </select>
+      </div>
+
+      <!-- Penilaian -->
+      <div class="clay-card p-5 sm:p-6">
+        <div class="flex items-center gap-2 mb-1">
+          <span class="section-num">2</span>
+          <h2 class="font-bold text-gray-700 text-sm sm:text-base">Penilaian Layanan</h2>
+        </div>
+        <p class="text-xs text-gray-400 mb-4 ml-8">Pilih 1 (Sangat Buruk) hingga 5 (Sangat Baik)</p>
+
+        <!-- Q1 -->
+        <div class="q-block" id="qblock-q1">
+          <div class="flex items-start gap-2 mb-1">
+            <span class="q-num-badge mt-0.5" id="badge-q1">Q1</span>
+            <div>
+              <p class="text-sm font-semibold text-gray-700">😊 Keramahan &amp; Kesopanan Petugas</p>
+              <p class="text-xs text-gray-400 mt-0.5 mb-2.5">Apakah petugas bersikap ramah dan sopan?</p>
+            </div>
+          </div>
+          <div class="rating-group ml-7">
+            <label class="rating-label"><input type="radio" name="q1" value="1" required onchange="updateProgress()"><div class="rating-box">1</div><span class="rating-num">Buruk</span></label>
+            <label class="rating-label"><input type="radio" name="q1" value="2" onchange="updateProgress()"><div class="rating-box">2</div><span class="rating-num">Kurang</span></label>
+            <label class="rating-label"><input type="radio" name="q1" value="3" onchange="updateProgress()"><div class="rating-box">3</div><span class="rating-num">Cukup</span></label>
+            <label class="rating-label"><input type="radio" name="q1" value="4" onchange="updateProgress()"><div class="rating-box">4</div><span class="rating-num">Baik</span></label>
+            <label class="rating-label"><input type="radio" name="q1" value="5" onchange="updateProgress()"><div class="rating-box">5</div><span class="rating-num">Sangat Baik</span></label>
+          </div>
+        </div>
+
+        <!-- Q2 -->
+        <div class="q-block" id="qblock-q2">
+          <div class="flex items-start gap-2 mb-1">
+            <span class="q-num-badge mt-0.5" id="badge-q2">Q2</span>
+            <div>
+              <p class="text-sm font-semibold text-gray-700">⏳ Kecepatan &amp; Ketepatan Pelayanan</p>
+              <p class="text-xs text-gray-400 mt-0.5 mb-2.5">Seberapa cepat dan tepat waktu pelayanannya?</p>
+            </div>
+          </div>
+          <div class="rating-group ml-7">
+            <label class="rating-label"><input type="radio" name="q2" value="1" required onchange="updateProgress()"><div class="rating-box">1</div><span class="rating-num">Buruk</span></label>
+            <label class="rating-label"><input type="radio" name="q2" value="2" onchange="updateProgress()"><div class="rating-box">2</div><span class="rating-num">Kurang</span></label>
+            <label class="rating-label"><input type="radio" name="q2" value="3" onchange="updateProgress()"><div class="rating-box">3</div><span class="rating-num">Cukup</span></label>
+            <label class="rating-label"><input type="radio" name="q2" value="4" onchange="updateProgress()"><div class="rating-box">4</div><span class="rating-num">Baik</span></label>
+            <label class="rating-label"><input type="radio" name="q2" value="5" onchange="updateProgress()"><div class="rating-box">5</div><span class="rating-num">Sangat Baik</span></label>
+          </div>
+        </div>
+
+        <!-- Q3 -->
+        <div class="q-block" id="qblock-q3">
+          <div class="flex items-start gap-2 mb-1">
+            <span class="q-num-badge mt-0.5" id="badge-q3">Q3</span>
+            <div>
+              <p class="text-sm font-semibold text-gray-700">🏥 Kebersihan &amp; Kenyamanan Fasilitas</p>
+              <p class="text-xs text-gray-400 mt-0.5 mb-2.5">Bagaimana kondisi kebersihan dan kenyamanan ruangan?</p>
+            </div>
+          </div>
+          <div class="rating-group ml-7">
+            <label class="rating-label"><input type="radio" name="q3" value="1" required onchange="updateProgress()"><div class="rating-box">1</div><span class="rating-num">Buruk</span></label>
+            <label class="rating-label"><input type="radio" name="q3" value="2" onchange="updateProgress()"><div class="rating-box">2</div><span class="rating-num">Kurang</span></label>
+            <label class="rating-label"><input type="radio" name="q3" value="3" onchange="updateProgress()"><div class="rating-box">3</div><span class="rating-num">Cukup</span></label>
+            <label class="rating-label"><input type="radio" name="q3" value="4" onchange="updateProgress()"><div class="rating-box">4</div><span class="rating-num">Baik</span></label>
+            <label class="rating-label"><input type="radio" name="q3" value="5" onchange="updateProgress()"><div class="rating-box">5</div><span class="rating-num">Sangat Baik</span></label>
+          </div>
+        </div>
+
+        <!-- Q4 -->
+        <div class="q-block" id="qblock-q4">
+          <div class="flex items-start gap-2 mb-1">
+            <span class="q-num-badge mt-0.5" id="badge-q4">Q4</span>
+            <div>
+              <p class="text-sm font-semibold text-gray-700">💊 Kualitas Penanganan Medis</p>
+              <p class="text-xs text-gray-400 mt-0.5 mb-2.5">Bagaimana kualitas diagnosis, konsultasi, dan penanganan medis?</p>
+            </div>
+          </div>
+          <div class="rating-group ml-7">
+            <label class="rating-label"><input type="radio" name="q4" value="1" required onchange="updateProgress()"><div class="rating-box">1</div><span class="rating-num">Buruk</span></label>
+            <label class="rating-label"><input type="radio" name="q4" value="2" onchange="updateProgress()"><div class="rating-box">2</div><span class="rating-num">Kurang</span></label>
+            <label class="rating-label"><input type="radio" name="q4" value="3" onchange="updateProgress()"><div class="rating-box">3</div><span class="rating-num">Cukup</span></label>
+            <label class="rating-label"><input type="radio" name="q4" value="4" onchange="updateProgress()"><div class="rating-box">4</div><span class="rating-num">Baik</span></label>
+            <label class="rating-label"><input type="radio" name="q4" value="5" onchange="updateProgress()"><div class="rating-box">5</div><span class="rating-num">Sangat Baik</span></label>
+          </div>
+        </div>
+      </div>
+
+      <!-- Kritik & Saran -->
+      <div class="clay-card p-5 sm:p-6">
+        <div class="flex items-center gap-2 mb-3 sm:mb-4">
+          <span class="section-num" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed);">3</span>
+          <h2 class="font-bold text-gray-700 text-sm sm:text-base">Kritik &amp; Saran <span class="text-gray-400 text-xs font-normal">(opsional)</span></h2>
+        </div>
+        <label class="field-label" for="saran">Ceritakan pengalaman atau berikan masukan Anda</label>
+        <textarea id="saran" class="clay-textarea" placeholder="Contoh: Petugas sangat ramah, namun waktu tunggu cukup lama. Saran saya..."></textarea>
+        <p class="text-xs text-gray-400 mt-1.5" id="char-count">0 karakter</p>
+      </div>
+
+      <button type="submit" id="submit-btn"
+        class="clay-btn w-full py-3.5 sm:py-4 bg-gradient-to-r from-blue-500 to-cyan-500 text-white text-sm sm:text-base"
+        disabled style="opacity:.45;cursor:not-allowed;" aria-disabled="true">
+        Kirim Survei 🚀
+      </button>
+      <p class="text-center text-xs text-gray-400 -mt-2" id="submit-hint">Lengkapi semua pertanyaan untuk mengaktifkan tombol kirim</p>
+    </form>
+  </main>
+
+  <!-- EXIT MODAL -->
+  <div id="exit-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="exit-title">
+    <div class="exit-modal-card p-6 sm:p-7 max-w-xs sm:max-w-sm w-full mx-auto pop-in">
+      <div class="text-center mb-4">
+        <div class="text-4xl sm:text-5xl mb-3">⚠️</div>
+        <h3 class="font-extrabold text-gray-800 text-base sm:text-lg mb-1" id="exit-title">Yakin Ingin Keluar?</h3>
+        <p class="text-gray-500 text-xs sm:text-sm leading-6">Progres pengisian survei Anda <strong class="text-red-500">tidak akan tersimpan</strong> jika keluar sekarang.</p>
+      </div>
+      <div class="bg-red-50 border border-red-100 rounded-2xl p-3 mb-4 text-center">
+        <p class="text-xs text-red-400 font-semibold mb-1">Progress saat ini</p>
+        <p id="exit-pct" class="text-2xl font-extrabold text-red-500">0%</p>
+        <p class="text-xs text-red-300 mt-0.5" id="exit-frac">0 dari 5 pertanyaan terisi</p>
+      </div>
+      <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+        <button onclick="closeExit()" class="flex-1 py-3 rounded-2xl bg-blue-600 text-white font-bold text-sm hover:bg-blue-700 transition shadow-md order-first sm:order-none">
+          Lanjutkan Isi Survei
+        </button>
+        <button onclick="confirmExit()" class="flex-1 py-3 rounded-2xl bg-gray-100 text-gray-500 font-semibold text-sm hover:bg-red-50 hover:text-red-500 transition">
+          Keluar Tanpa Simpan
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SUCCESS MODAL -->
+  <div id="success-modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="clay-card p-6 sm:p-8 max-w-xs sm:max-w-sm w-full mx-auto pop-in relative overflow-hidden">
+      <div id="confetti-container" class="absolute inset-0 pointer-events-none overflow-hidden"></div>
+      <div class="text-center relative">
+        <div class="text-4xl sm:text-5xl mb-3">🎉</div>
+        <h3 class="font-extrabold text-gray-800 text-lg sm:text-xl mb-1">Terima Kasih!</h3>
+        <p class="text-gray-500 text-xs sm:text-sm leading-6 mb-3">Survei Anda berhasil tersimpan.<br/>Masukan Anda sangat berarti bagi UNS Medical Center.</p>
+        <div class="bg-blue-50 border border-blue-100 rounded-2xl p-3 sm:p-4 mb-4">
+          <p class="text-xs text-blue-400 font-semibold mb-1">Nilai Rata-rata Anda</p>
+          <p id="modal-score-num" class="text-2xl sm:text-3xl font-extrabold text-blue-600"></p>
+          <p id="modal-score-label" class="text-xs text-blue-400 mt-1"></p>
+        </div>
+        <div class="progress-track mb-2" style="height:8px;">
+          <div id="redirect-bar" class="progress-fill done" style="width:100%;height:100%;transition:width 3.8s linear;"></div>
+        </div>
+        <p class="text-xs text-gray-400 mb-4">Mengalihkan ke beranda dalam 4 detik…</p>
+        <button onclick="goHome()" class="clay-btn w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm">
+          Kembali ke Beranda Sekarang
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const raw = localStorage.getItem('uns_active_user');
+    if(!raw) window.location.href = 'login.html';
+
+    document.getElementById('saran').addEventListener('input', function(){
+      document.getElementById('char-count').textContent = this.value.length + ' karakter';
+    });
+
+    /*
+     * FIX #4: beforeunload tidak berfungsi di mobile browsers (iOS Safari, Chrome Android)
+     * — ini adalah EXPECTED BEHAVIOR pada mobile browser karena alasan UX.
+     * Proteksi exit di mobile sudah tersedia via tombol "Keluar Survei" di navbar.
+     * Event ini hanya aktif di desktop browser.
+     */
+    let formDirty = false;
+    window.addEventListener('beforeunload', function(e){
+      if(formDirty){ e.preventDefault(); e.returnValue = ''; }
+    });
+
+    const TOTAL = 5;
+    const hints = [
+      'Pilih kategori pengunjung Anda',
+      'Nilai keramahan petugas (pertanyaan 1)',
+      'Nilai kecepatan pelayanan (pertanyaan 2)',
+      'Nilai kebersihan fasilitas (pertanyaan 3)',
+      'Nilai kualitas medis (pertanyaan 4) — hampir selesai!',
+      '🎉 Semua terisi — siap dikirim!'
+    ];
+
+    function getChecks(){
+      return [
+        !!document.getElementById('kategori').value,
+        !!document.querySelector('input[name="q1"]:checked'),
+        !!document.querySelector('input[name="q2"]:checked'),
+        !!document.querySelector('input[name="q3"]:checked'),
+        !!document.querySelector('input[name="q4"]:checked'),
+      ];
+    }
+
+    function updateProgress(){
+      formDirty = true;
+      const checks = getChecks();
+      const filled = checks.filter(Boolean).length;
+      const pct    = Math.round((filled/TOTAL)*100);
+      const done   = filled === TOTAL;
+
+      const fill = document.getElementById('progress-fill');
+      fill.style.width = pct + '%';
+      fill.classList.toggle('done', done);
+
+      const pctEl = document.getElementById('prog-pct');
+      pctEl.textContent = pct + '%';
+      pctEl.style.color = done ? '#16a34a' : '#3b82f6';
+      document.getElementById('prog-frac').textContent = `(${filled}/${TOTAL})`;
+      document.getElementById('prog-label').textContent = hints[filled];
+      document.getElementById('prog-badge').classList.toggle('hidden', !done);
+
+      ['dot-k','dot-q1','dot-q2','dot-q3','dot-q4'].forEach((id,i)=>{
+        const dot = document.getElementById(id);
+        dot.classList.toggle('filled', checks[i]);
+        dot.classList.toggle('all-done', checks[i] && done);
+      });
+
+      ['q1','q2','q3','q4'].forEach((q,i)=>{
+        document.getElementById('qblock-'+q).classList.toggle('answered', checks[i+1]);
+      });
+
+      const btn  = document.getElementById('submit-btn');
+      const hint = document.getElementById('submit-hint');
+      if(done){
+        btn.disabled = false; btn.style.opacity='1'; btn.style.cursor='pointer';
+        btn.setAttribute('aria-disabled','false');
+        btn.textContent = 'Kirim Survei ✅';
+        hint.textContent = 'Form sudah lengkap — siap dikirim!';
+        hint.style.color = '#16a34a';
+      } else {
+        btn.disabled = true; btn.style.opacity='.45'; btn.style.cursor='not-allowed';
+        btn.setAttribute('aria-disabled','true');
+        btn.textContent = 'Kirim Survei 🚀';
+        hint.textContent = 'Lengkapi semua pertanyaan untuk mengaktifkan tombol kirim';
+        hint.style.color = '#9ca3af';
+      }
+    }
+
+    function tryExit(){
+      const checks = getChecks();
+      const filled = checks.filter(Boolean).length;
+      const pct    = Math.round((filled/TOTAL)*100);
+      document.getElementById('exit-pct').textContent   = pct + '%';
+      document.getElementById('exit-frac').textContent  = `${filled} dari ${TOTAL} pertanyaan terisi`;
+      document.getElementById('exit-modal').classList.add('show');
+    }
+    function closeExit(){ document.getElementById('exit-modal').classList.remove('show'); }
+    function confirmExit(){ formDirty = false; window.location.href = 'index.html'; }
+
+    function handleSubmit(e){
+      e.preventDefault();
+      const user     = JSON.parse(raw);
+      const kategori = document.getElementById('kategori').value;
+      const vals     = ['q1','q2','q3','q4'].map(q => +document.querySelector(`input[name="${q}"]:checked`).value);
+      const avg      = (vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(2);
+      const saran    = document.getElementById('saran').value.trim();
+
+      const entry = {
+        id:Date.now(), tanggal:new Date().toLocaleString('id-ID'),
+        nama:user.name, email:user.email, kategori,
+        penilaian:{keramahan:vals[0],kecepatan:vals[1],kebersihan:vals[2],kualitasMedis:vals[3]},
+        rataRata:avg, saran:saran||'-'
+      };
+      const surveys = JSON.parse(localStorage.getItem('uns_surveys')||'[]');
+      surveys.push(entry);
+      localStorage.setItem('uns_surveys',JSON.stringify(surveys));
+
+      const scoreLabels = ['😢 Sangat Buruk','😕 Kurang Memuaskan','😐 Cukup Memuaskan','😊 Memuaskan','🤩 Sangat Memuaskan'];
+      document.getElementById('modal-score-num').textContent   = avg + ' / 5.00';
+      document.getElementById('modal-score-label').textContent = scoreLabels[Math.round(avg)-1];
+
+      formDirty = false;
+      document.getElementById('success-modal').classList.add('show');
+      spawnConfetti();
+      setTimeout(()=>{ document.getElementById('redirect-bar').style.width = '0'; }, 50);
+      setTimeout(()=> goHome(), 4000);
+    }
+
+    function spawnConfetti(){
+      const colors = ['#3b82f6','#06b6d4','#34d399','#fbbf24','#f87171','#a78bfa'];
+      const container = document.getElementById('confetti-container');
+      for(let i=0; i<18; i++){
+        const el = document.createElement('div');
+        el.className = 'confetti';
+        el.style.cssText = `left:${Math.random()*100}%;top:${-8+Math.random()*8}px;background:${colors[i%colors.length]};animation-delay:${Math.random()*.5}s;animation-duration:${.9+Math.random()*.6}s;transform:rotate(${Math.random()*360}deg);`;
+        container.appendChild(el);
+      }
+    }
+
+    function goHome(){ window.location.href = 'index.html'; }
+  </script>
+</body>
+</html>

@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Beranda — UNS Medical Center</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *{font-family:'Plus Jakarta Sans',sans-serif;box-sizing:border-box;}
+    body{background:linear-gradient(135deg,#dbeafe 0%,#e0f2fe 50%,#f0fdf4 100%);min-height:100vh;overflow-x:hidden;}
+    .blob{position:fixed;border-radius:50%;filter:blur(60px);pointer-events:none;z-index:0;}
+
+    .clay-card{background:#fff;border-radius:28px;
+      box-shadow:8px 8px 24px rgba(99,149,210,.22),-2px -2px 8px rgba(255,255,255,.9),
+        inset 3px 3px 8px rgba(255,255,255,.85),inset -3px -3px 8px rgba(180,210,245,.35);
+      border:1.5px solid rgba(255,255,255,.75);transition:transform .2s,box-shadow .2s;}
+    .clay-card:hover{transform:translateY(-3px);
+      box-shadow:12px 12px 32px rgba(99,149,210,.28),-2px -2px 10px rgba(255,255,255,.95),
+        inset 3px 3px 8px rgba(255,255,255,.85),inset -3px -3px 8px rgba(180,210,245,.35);}
+
+    .clay-btn{border-radius:16px;font-weight:700;border:none;cursor:pointer;
+      box-shadow:5px 5px 14px rgba(59,130,246,.35),-1px -1px 5px rgba(255,255,255,.7),
+        inset 2px 2px 5px rgba(255,255,255,.4),inset -2px -2px 5px rgba(37,99,235,.25);
+      transition:all .18s ease;}
+    .clay-btn:hover{transform:translateY(-2px) scale(1.01);}
+    .clay-btn:active{transform:translateY(0) scale(.98);}
+
+    .clay-nav{background:rgba(255,255,255,.82);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+      border-bottom:1.5px solid rgba(255,255,255,.6);box-shadow:0 4px 20px rgba(99,149,210,.12);}
+    .nav-link{color:#64748b;font-size:.875rem;font-weight:600;padding:.5rem 1rem;border-radius:10px;
+      transition:background .15s,color .15s;text-decoration:none;}
+    .nav-link:hover,.nav-link.active{background:rgba(59,130,246,.1);color:#2563eb;}
+    .nav-danger{color:#ef4444;font-size:.875rem;font-weight:600;padding:.5rem 1rem;border-radius:10px;
+      cursor:pointer;transition:background .15s;background:none;border:none;}
+    .nav-danger:hover{background:rgba(239,68,68,.08);}
+
+    /* FIX: Hero dengan overflow:hidden dan position:relative yg benar */
+    .hero-bg{
+      background:linear-gradient(135deg,#1e3a6e 0%,#1e40af 55%,#0284c7 100%);
+      border-radius:28px;
+      box-shadow:8px 8px 28px rgba(30,58,138,.3),inset 3px 3px 10px rgba(255,255,255,.1);
+      overflow:hidden; /* clip dekorasi yg melebihi batas */
+      position:relative;
+      contain:layout; /* tambahan fix scroll horizontal */
+    }
+    .stat-pill{background:rgba(255,255,255,.18);border:1.5px solid rgba(255,255,255,.3);
+      border-radius:50px;padding:.4rem .9rem;backdrop-filter:blur(8px);}
+    .info-icon{border-radius:16px;box-shadow:3px 3px 10px rgba(99,149,210,.2),inset 2px 2px 5px rgba(255,255,255,.8);}
+    .avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#3b82f6,#06b6d4);
+      display:flex;align-items:center;justify-content:center;font-weight:800;color:white;
+      font-size:.82rem;flex-shrink:0;box-shadow:3px 3px 8px rgba(59,130,246,.35);}
+    .badge{display:inline-flex;align-items:center;gap:5px;background:#f0fdf4;
+      border:1.5px solid #bbf7d0;border-radius:999px;padding:3px 10px;font-size:.73rem;font-weight:700;color:#16a34a;}
+
+    /* Sosmed links */
+    .social-link{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:14px;
+      text-decoration:none;font-size:.85rem;font-weight:600;transition:all .18s ease;border:1.5px solid transparent;}
+    .social-link:hover{transform:translateX(4px);}
+    .social-ig{background:#fdf2f8;border-color:#fbcfe8;color:#9d174d;}
+    .social-ig:hover{background:#fce7f3;}
+    .social-tt{background:#f0fdf4;border-color:#bbf7d0;color:#065f46;}
+    .social-tt:hover{background:#dcfce7;}
+    .social-wa{background:#f0fdf4;border-color:#86efac;color:#15803d;}
+    .social-wa:hover{background:#dcfce7;}
+    .social-maps{background:#eff6ff;border-color:#bfdbfe;color:#1e40af;}
+    .social-maps:hover{background:#dbeafe;}
+
+    /* Modals */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.3);backdrop-filter:blur(6px);
+      z-index:999;display:none;align-items:center;justify-content:center;padding:1rem;}
+    .modal-overlay.show{display:flex;}
+    @keyframes popIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+    .pop-in{animation:popIn .3s cubic-bezier(.34,1.56,.64,1) both;}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    .fade-up{animation:fadeUp .5s ease both;}
+    .d1{animation-delay:.06s}.d2{animation-delay:.12s}.d3{animation-delay:.18s}.d4{animation-delay:.24s}
+
+    /* ── Poli Slider ── */
+    #poli-slides{display:flex;height:100%;}
+    .poli-slide{min-width:100%;padding:16px;display:flex;flex-direction:column;justify-content:center;border-radius:16px;transition:opacity .3s;}
+    .poli-dot{width:7px;height:7px;border-radius:50%;background:#dbeafe;border:1.5px solid #bfdbfe;transition:all .25s ease;cursor:pointer;}
+    .poli-dot.active{background:#3b82f6;border-color:#2563eb;width:20px;border-radius:4px;}
+
+    /* ── Tabel Rekap ── */
+    #rekap-table tbody tr:nth-child(even){background:#f8faff;}
+    #rekap-table tbody tr:nth-child(odd){background:#ffffff;}
+    #rekap-table tbody tr:hover{background:#eff6ff;transition:background .12s;}
+    #rekap-table tbody td{padding:8px 12px;border-bottom:1px solid #f1f5f9;color:#334155;}
+    #rekap-table tbody tr:last-child td{border-bottom:none;}
+    #rekap-table tbody tr:last-child td:first-child{border-bottom-left-radius:16px;}
+    #rekap-table tbody tr:last-child td:last-child{border-bottom-right-radius:16px;}
+    .score-pill{display:inline-block;border-radius:999px;padding:2px 9px;font-weight:700;font-size:.72rem;}
+    .score-5{background:#dcfce7;color:#15803d;}
+    .score-4{background:#dbeafe;color:#1d4ed8;}
+    .score-3{background:#fef9c3;color:#a16207;}
+    .score-2{background:#fee2e2;color:#b91c1c;}
+    .score-1{background:#fce7f3;color:#9d174d;}
+    .kat-badge{display:inline-block;border-radius:999px;padding:2px 8px;font-weight:700;font-size:.7rem;}
+    .kat-mhs{background:#eff6ff;color:#1d4ed8;}
+    .kat-dos{background:#f0fdf4;color:#15803d;}
+    .kat-kar{background:#fefce8;color:#a16207;}
+    .kat-umu{background:#fdf4ff;color:#7e22ce;}
+    /* Mini bar chart */
+    .kat-bar-fill{height:8px;border-radius:999px;transition:width .6s ease;}
+
+    /* Mobile fixes */
+    @media(max-width:640px){
+      .hero-bg{border-radius:20px;}
+      .clay-card{border-radius:20px;}
+    }
+  </style>
+</head>
+<body class="overflow-x-hidden">
+  <div class="blob w-80 h-80 bg-blue-200 opacity-35" style="top:-5rem;left:-5rem;"></div>
+  <div class="blob w-96 h-96 bg-cyan-200 opacity-25" style="bottom:-5rem;right:-5rem;"></div>
+
+  <!-- NAVBAR -->
+  <nav class="clay-nav sticky top-0 z-50">
+    <div class="max-w-5xl mx-auto px-4 sm:px-5 py-3 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <img src="https://uns.ac.id/id/wp-content/uploads/2023/06/logo-uns-biru.png"
+             alt="Logo UNS" class="h-8 sm:h-9 object-contain flex-shrink-0"
+             style="filter:drop-shadow(0 2px 4px rgba(30,58,138,.3))"
+             onerror="this.style.display='none'"/>
+        <div class="hidden sm:block min-w-0">
+          <p class="font-extrabold text-gray-800 text-sm leading-tight truncate">UNS Medical Center</p>
+          <p class="text-blue-400 text-xs font-medium">Survei Kepuasan Pasien</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-1 flex-shrink-0">
+        <a href="index.html" class="nav-link active">Beranda</a>
+        <div class="hidden sm:flex items-center gap-2 ml-2 pl-3 border-l border-gray-200">
+          <div class="avatar" id="nav-avatar">?</div>
+          <span class="text-xs font-semibold text-gray-600 max-w-[90px] truncate" id="nav-name"></span>
+        </div>
+        <button onclick="openLogout()" class="nav-danger ml-1" aria-label="Logout">Logout</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-5xl mx-auto px-4 sm:px-5 py-6 sm:py-8 space-y-5 sm:space-y-6 pb-6 relative z-10">
+
+    <!-- HERO — FIX overflow -->
+    <div class="hero-bg p-6 sm:p-10 fade-up">
+      <!-- Dekorasi bulat — DALAM overflow:hidden agar tidak bikin scroll -->
+      <div class="absolute top-0 right-0 w-56 h-56 rounded-full opacity-10 pointer-events-none"
+           style="background:white;transform:translate(40%,-40%);"></div>
+      <div class="absolute bottom-0 left-1/3 w-32 h-32 rounded-full opacity-10 pointer-events-none"
+           style="background:white;transform:translateY(60%);"></div>
+
+      <div class="relative flex flex-col sm:flex-row sm:items-center gap-5">
+        <div class="flex-1">
+          <div class="flex items-center gap-2 mb-2 flex-wrap">
+            <span class="stat-pill text-white text-xs font-semibold">👋 Selamat Datang</span>
+            <span id="survey-badge" class="hidden badge"></span>
+          </div>
+          <h1 id="welcome-name" class="text-white font-extrabold text-xl sm:text-3xl leading-tight mt-1">Memuat...</h1>
+          <p class="text-blue-200 text-sm mt-2 max-w-md leading-6">Bantu kami meningkatkan pelayanan dengan mengisi survei kepuasan. Pendapat Anda sangat berarti bagi UNS Medical Center!</p>
+          <div class="flex flex-wrap gap-2 mt-3 sm:mt-4">
+            <span class="stat-pill text-white text-xs font-semibold">✅ Anonim &amp; Aman</span>
+            <span class="stat-pill text-white text-xs font-semibold">⏱ &lt; 2 Menit</span>
+            <span class="stat-pill text-white text-xs font-semibold">📊 Bantu Layanan</span>
+          </div>
+          <button onclick="startSurvey()" class="clay-btn bg-white text-blue-800 px-6 sm:px-7 py-3 sm:py-3.5 text-sm mt-4 sm:mt-5 inline-block font-bold">
+            Mulai Isi Survei →
+          </button>
+        </div>
+        <!-- Storyset: Medicine – Amico (hidden on xs) -->
+        <div class="hidden sm:block flex-shrink-0">
+          <img src="https://stories.freepiklabs.com/storage/6285/Medicine_Mesa-de-trabajo-1.svg"
+               alt="Ilustrasi medis" class="w-40 sm:w-48 h-40 sm:h-48 object-contain"/>
+        </div>
+      </div>
+    </div>
+
+    <!-- STAT CARDS -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 fade-up d1">
+      <div class="clay-card p-3 sm:p-4 text-center">
+        <p class="text-xl sm:text-2xl font-extrabold text-blue-600">500+</p>
+        <p class="text-blue-400 text-xs font-semibold mt-1">Pasien/Bulan</p>
+      </div>
+      <div class="clay-card p-3 sm:p-4 text-center">
+        <p class="text-xl sm:text-2xl font-extrabold text-green-600">12+</p>
+        <p class="text-green-400 text-xs font-semibold mt-1">Dokter Ahli</p>
+      </div>
+      <div class="clay-card p-3 sm:p-4 text-center">
+        <p class="text-xl sm:text-2xl font-extrabold text-purple-600">8</p>
+        <p class="text-purple-400 text-xs font-semibold mt-1">Poli Layanan</p>
+      </div>
+      <div class="clay-card p-3 sm:p-4 text-center">
+        <p class="text-xl sm:text-2xl font-extrabold text-cyan-600">4.7⭐</p>
+        <p class="text-cyan-400 text-xs font-semibold mt-1">Rating Kami</p>
+      </div>
+    </div>
+
+    <!-- TENTANG + POLI SLIDER -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 fade-up d2">
+
+      <!-- Tentang -->
+      <div class="clay-card p-5 sm:p-6">
+        <div class="flex-shrink-0 flex justify-center mb-3">
+          <img src="https://stories.freepiklabs.com/storage/4637/Health-Professional-Team_Mesa-de-trabajo-1.svg"
+               alt="Tim Kesehatan UNS" class="w-36 h-28 object-contain drop-shadow-sm"/>
+        </div>
+        <h2 class="font-extrabold text-gray-800 text-base mb-2">Tentang UNS Medical Center</h2>
+        <p class="text-gray-500 text-sm leading-6">
+          <strong class="text-gray-700">UNS Medical Center</strong> adalah unit pelayanan kesehatan terpadu milik Universitas Sebelas Maret Surakarta, melayani sivitas akademika dan masyarakat umum secara profesional, terjangkau, dan ramah.
+        </p>
+      </div>
+
+      <!-- Poli Slider -->
+      <div class="clay-card p-5 sm:p-6 flex flex-col">
+        <h3 class="font-bold text-gray-700 text-sm sm:text-base mb-4 flex items-center gap-2">
+          <span class="info-icon bg-blue-50 w-8 h-8 flex items-center justify-center text-base">🏥</span>
+          Layanan Poli Kami
+        </h3>
+        <!-- Slide area -->
+        <div class="flex-1 relative overflow-hidden rounded-2xl" style="min-height:130px;">
+          <div id="poli-slides" class="flex transition-transform duration-400 ease-in-out h-full" style="will-change:transform;">
+            <!-- slides injected by JS -->
+          </div>
+        </div>
+        <!-- Dots + nav -->
+        <div class="flex items-center justify-between mt-4">
+          <button onclick="poliPrev()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-blue-100 text-gray-500 hover:text-blue-600 flex items-center justify-center transition-colors text-sm font-bold" aria-label="Sebelumnya">‹</button>
+          <div id="poli-dots" class="flex gap-1.5"></div>
+          <button onclick="poliNext()" class="w-8 h-8 rounded-full bg-gray-100 hover:bg-blue-100 text-gray-500 hover:text-blue-600 flex items-center justify-center transition-colors text-sm font-bold" aria-label="Berikutnya">›</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- INFO ROW: Jam Operasional saja (statistik masuk ke rekap) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5 fade-up d3">
+
+      <!-- Jam Operasional -->
+      <div class="clay-card p-5 sm:p-6 space-y-3">
+        <h3 class="font-bold text-gray-700 text-sm sm:text-base flex items-center gap-2">
+          <span class="info-icon bg-blue-50 w-8 sm:w-9 h-8 sm:h-9 flex items-center justify-center text-base sm:text-lg">🕐</span>
+          Jam Operasional
+        </h3>
+        <div class="space-y-2 text-xs sm:text-sm">
+          <div class="flex justify-between items-center bg-blue-50 rounded-xl px-3 py-2">
+            <span class="text-gray-600 font-medium">Senin – Jumat</span>
+            <span class="font-bold text-blue-700">07.00 – 21.00 WIB</span>
+          </div>
+          <div class="flex justify-between items-center bg-gray-50 rounded-xl px-3 py-2">
+            <span class="text-gray-600 font-medium">Sabtu – Minggu</span>
+            <span class="font-bold text-gray-700">08.00 – 17.00 WIB</span>
+          </div>
+        </div>
+        <a href="https://maps.app.goo.gl/GE2sjfLzP5Q7W1ix8" target="_blank" rel="noopener" class="social-link social-maps w-full text-sm">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Lihat di Google Maps
+        </a>
+      </div>
+
+      <!-- Statistik ringkas -->
+      <div class="clay-card p-5 sm:p-6">
+        <h3 class="font-bold text-gray-700 text-sm sm:text-base mb-3 flex items-center gap-2">
+          <span class="info-icon bg-purple-50 w-8 sm:w-9 h-8 sm:h-9 flex items-center justify-center">📊</span>
+          Statistik Survei
+        </h3>
+        <div class="grid grid-cols-3 gap-2 mb-3">
+          <div class="bg-blue-50 rounded-2xl p-3 text-center">
+            <p class="text-lg font-extrabold text-blue-600" id="stat-total">–</p>
+            <p class="text-blue-400 text-xs font-semibold mt-0.5">Responden</p>
+          </div>
+          <div class="bg-green-50 rounded-2xl p-3 text-center">
+            <p class="text-lg font-extrabold text-green-600" id="stat-avg">–</p>
+            <p class="text-green-400 text-xs font-semibold mt-0.5">Rata-rata</p>
+          </div>
+          <div class="bg-purple-50 rounded-2xl p-3 text-center">
+            <p class="text-lg font-extrabold text-purple-600" id="stat-satisfied">–</p>
+            <p class="text-purple-400 text-xs font-semibold mt-0.5">Tingkat Puas</p>
+          </div>
+        </div>
+        <div id="kat-bars" class="space-y-1.5"></div>
+        <p class="text-xs text-gray-300 mt-2">*Termasuk data historis</p>
+      </div>
+    </div>
+
+    <!-- TABEL REKAP PER ASPEK LAYANAN (full width) -->
+    <div class="clay-card p-5 sm:p-6 fade-up d3">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+        <div class="flex items-center gap-2">
+          <span class="info-icon bg-indigo-50 w-8 sm:w-9 h-8 sm:h-9 flex items-center justify-center text-base sm:text-lg">📋</span>
+          <div>
+            <h3 class="font-bold text-gray-700 text-sm sm:text-base">Rekap Penilaian per Aspek Layanan</h3>
+            <p class="text-gray-400 text-xs" id="tabel-subtitle">Memuat data...</p>
+          </div>
+        </div>
+        <!-- Filter kategori -->
+        <select id="filter-kat" onchange="renderTable()"
+          class="text-xs font-semibold border border-gray-200 rounded-xl px-3 py-2 bg-gray-50 text-gray-600 outline-none cursor-pointer hover:border-blue-300 transition-colors self-start sm:self-auto">
+          <option value="">Semua Kategori</option>
+          <option value="Mahasiswa">Mahasiswa</option>
+          <option value="Dosen">Dosen</option>
+          <option value="Karyawan">Karyawan</option>
+          <option value="Umum">Umum</option>
+        </select>
+      </div>
+
+      <!-- Table -->
+      <div class="overflow-x-auto rounded-2xl">
+        <table class="w-full text-xs sm:text-sm border-collapse" id="rekap-table" style="min-width:480px;">
+          <thead>
+            <tr>
+              <th class="text-left font-bold text-white px-4 py-3 rounded-tl-2xl" style="background:#1e40af;">Aspek Layanan</th>
+              <th class="text-center font-bold text-white px-3 py-3" style="background:#1e40af;">Rata-rata</th>
+              <th class="text-center font-bold text-white px-3 py-3" style="background:#1e40af;">Responden</th>
+              <th class="text-left font-bold text-white px-3 py-3 rounded-tr-2xl" style="background:#1e40af;">Distribusi Nilai</th>
+            </tr>
+          </thead>
+          <tbody id="rekap-tbody"></tbody>
+        </table>
+      </div>
+
+      <!-- Empty state -->
+      <div id="empty-state" class="hidden text-center py-10">
+        <p class="text-4xl mb-2">📭</p>
+        <p class="text-gray-400 text-sm font-semibold">Belum ada data survei nyata</p>
+        <p class="text-gray-300 text-xs mt-1">Statistik di atas menggunakan data historis. Isi survei untuk menambah data baru.</p>
+      </div>
+
+      <!-- Legend -->
+      <div class="mt-4 flex flex-wrap gap-2 text-xs">
+        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full inline-block" style="background:#22c55e;"></span><span class="text-gray-400">Nilai 5</span></span>
+        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full inline-block" style="background:#3b82f6;"></span><span class="text-gray-400">Nilai 4</span></span>
+        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full inline-block" style="background:#f59e0b;"></span><span class="text-gray-400">Nilai 3</span></span>
+        <span class="flex items-center gap-1"><span class="w-3 h-3 rounded-full inline-block" style="background:#ef4444;"></span><span class="text-gray-400">Nilai 1–2</span></span>
+        <span class="text-gray-300 ml-auto">*Data bersifat anonim</span>
+      </div>
+    </div>
+
+    <!-- CTA -->
+    <div class="text-center pb-2 fade-up d4">
+      <p class="text-gray-400 text-sm mb-3">Siap berbagi pengalaman Anda?</p>
+      <button onclick="startSurvey()" class="clay-btn bg-gradient-to-r from-blue-600 to-cyan-500 text-white px-7 sm:px-8 py-3 sm:py-3.5 text-sm font-bold">
+        Isi Survei Sekarang 🚀
+      </button>
+    </div>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="relative z-10 border-t border-white/60 bg-white/40 backdrop-blur-sm mt-4">
+    <div class="max-w-5xl mx-auto px-4 sm:px-5 py-4 sm:py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-gray-400 font-medium">
+      <div class="flex items-center gap-2">
+        <img src="https://senirupa.fkip.uns.ac.id/wp-content/uploads/2021/07/logo_putih.png"
+             alt="Logo UNS" class="h-5 sm:h-6 object-contain opacity-50"
+             onerror="this.style.display='none'"/>
+        <span>© 2025 UNS Medical Center · Universitas Sebelas Maret</span>
+      </div>
+      <div class="flex gap-3 sm:gap-4 flex-wrap justify-center">
+        <a href="https://www.instagram.com/unsmedicalcenter/" target="_blank" rel="noopener" class="hover:text-pink-500 transition-colors">Instagram</a>
+        <a href="https://www.tiktok.com/@unsmedicalcenter" target="_blank" rel="noopener" class="hover:text-green-600 transition-colors">TikTok</a>
+        <a href="http://wa.me/6285183266984" target="_blank" rel="noopener" class="hover:text-green-500 transition-colors">WhatsApp</a>
+        <a href="https://uns.ac.id/id/fasilitas-kampus/uns-medical-center" target="_blank" rel="noopener" class="hover:text-blue-600 transition-colors">Website UNS</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- LOGOUT MODAL -->
+  <div id="logout-modal" class="modal-overlay" role="dialog" aria-modal="true">
+    <div class="clay-card p-6 sm:p-7 max-w-xs sm:max-w-sm w-full text-center pop-in mx-4">
+      <div class="text-5xl mb-3">👋</div>
+      <h3 class="font-extrabold text-gray-800 text-lg mb-1">Keluar dari Sistem?</h3>
+      <p class="text-gray-400 text-sm mb-5">Sesi Anda akan diakhiri dan Anda perlu login kembali.</p>
+      <div class="flex gap-3">
+        <button onclick="closeLogout()" class="flex-1 py-2.5 rounded-2xl bg-gray-100 text-gray-600 font-semibold text-sm hover:bg-gray-200 transition">Batal</button>
+        <button onclick="confirmLogout()" class="clay-btn flex-1 py-2.5 bg-gradient-to-r from-red-400 to-red-500 text-white text-sm">Keluar</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const raw = localStorage.getItem('uns_active_user');
+    if(!raw){ window.location.href='login.html'; }
+    else{
+      const user = JSON.parse(raw);
+      document.getElementById('welcome-name').textContent = user.name;
+      document.getElementById('nav-name').textContent     = user.name;
+      document.getElementById('nav-avatar').textContent   = user.name.charAt(0).toUpperCase();
+      const surveys = JSON.parse(localStorage.getItem('uns_surveys')||'[]');
+      const mine    = surveys.filter(s=>s.email===user.email);
+      if(mine.length>0){
+        const badge = document.getElementById('survey-badge');
+        badge.textContent = `✅ ${mine.length}× sudah mengisi`;
+        badge.classList.remove('hidden');
+      }
+    }
+
+    /* ══════════════════════════════════
+       POLI SLIDER
+    ══════════════════════════════════ */
+    const POLI_DATA = [
+      { icon:'🏥', name:'Poli Umum',   color:'#eff6ff', accent:'#2563eb', border:'#bfdbfe',
+        desc:'Pemeriksaan dan pengobatan keluhan kesehatan umum. Tersedia setiap hari kerja dengan dokter umum berpengalaman.',
+        jam:'Setiap hari kerja' },
+      { icon:'🦷', name:'Poli Gigi',   color:'#f0fdf4', accent:'#15803d', border:'#bbf7d0',
+        desc:'Perawatan gigi dan mulut: scaling, tambal, cabut, dan konsultasi kesehatan gigi oleh dokter gigi profesional.',
+        jam:'Senin – Sabtu' },
+      { icon:'🧠', name:'Poli Jiwa',   color:'#faf5ff', accent:'#7c3aed', border:'#e9d5ff',
+        desc:'Konsultasi kesehatan mental, psikiatri, dan penanganan gangguan kecemasan bersama psikiater terlatih.',
+        jam:'Selasa & Kamis' },
+      { icon:'🤱', name:'KIA',          color:'#fdf2f8', accent:'#9d174d', border:'#fbcfe8',
+        desc:'Layanan Kesehatan Ibu dan Anak: pemeriksaan kehamilan, imunisasi, tumbuh kembang, dan KB.',
+        jam:'Senin – Jumat' },
+      { icon:'🔬', name:'Laboratorium', color:'#fff7ed', accent:'#c2410c', border:'#fed7aa',
+        desc:'Pemeriksaan laboratorium klinik: darah lengkap, urine, gula darah, kolesterol, dan berbagai parameter diagnostik.',
+        jam:'Setiap hari kerja' },
+      { icon:'💊', name:'Farmasi',      color:'#ecfdf5', accent:'#065f46', border:'#6ee7b7',
+        desc:'Apotek terpadu menyediakan obat-obatan resep dan non-resep, dengan konseling penggunaan obat oleh apoteker.',
+        jam:'Sesuai jam klinik' },
+      { icon:'🥗', name:'Konsultasi Gizi', color:'#fffbeb', accent:'#a16207', border:'#fde68a',
+        desc:'Penilaian status gizi, penyusunan diet khusus, dan edukasi pola makan sehat bersama ahli gizi.',
+        jam:'Senin & Rabu' },
+    ];
+
+    let poliIdx = 0;
+    let poliTimer;
+
+    function buildPoliSlider(){
+      const wrap = document.getElementById('poli-slides');
+      const dots = document.getElementById('poli-dots');
+      wrap.innerHTML = POLI_DATA.map((p,i)=>`
+        <div class="poli-slide" style="background:${p.color};border:1.5px solid ${p.border};">
+          <div class="flex items-center gap-2 mb-2">
+            <span style="font-size:1.6rem;line-height:1;">${p.icon}</span>
+            <span style="font-weight:800;font-size:.95rem;color:${p.accent};">${p.name}</span>
+          </div>
+          <p style="font-size:.78rem;color:#475569;line-height:1.6;margin:0 0 8px;">${p.desc}</p>
+          <span style="background:${p.border};color:${p.accent};border-radius:999px;padding:2px 10px;font-size:.7rem;font-weight:700;display:inline-block;">⏰ ${p.jam}</span>
+        </div>`).join('');
+      dots.innerHTML = POLI_DATA.map((_,i)=>
+        `<button class="poli-dot${i===0?' active':''}" onclick="goSlide(${i})" aria-label="Poli ${i+1}"></button>`
+      ).join('');
+      goSlide(0,false);
+      startPoliAuto();
+    }
+
+    function goSlide(idx, animate=true){
+      poliIdx = (idx + POLI_DATA.length) % POLI_DATA.length;
+      const wrap = document.getElementById('poli-slides');
+      if(!animate) wrap.style.transition='none';
+      else wrap.style.transition='transform .38s cubic-bezier(.4,0,.2,1)';
+      wrap.style.transform = `translateX(-${poliIdx * 100}%)`;
+      document.querySelectorAll('.poli-dot').forEach((d,i)=>{
+        d.classList.toggle('active', i===poliIdx);
+      });
+    }
+    function poliNext(){ clearInterval(poliTimer); goSlide(poliIdx+1); startPoliAuto(); }
+    function poliPrev(){ clearInterval(poliTimer); goSlide(poliIdx-1); startPoliAuto(); }
+    function startPoliAuto(){ poliTimer = setInterval(()=>goSlide(poliIdx+1), 4000); }
+
+    /* ══════════════════════════════════
+       DATA DUMMY HISTORIS
+    ══════════════════════════════════ */
+    const DUMMY = [
+      {kategori:'Mahasiswa',penilaian:{keramahan:5,kecepatan:4,kebersihan:5,kualitasMedis:4},rataRata:'4.50'},
+      {kategori:'Mahasiswa',penilaian:{keramahan:4,kecepatan:3,kebersihan:4,kualitasMedis:4},rataRata:'3.75'},
+      {kategori:'Mahasiswa',penilaian:{keramahan:5,kecepatan:5,kebersihan:5,kualitasMedis:5},rataRata:'5.00'},
+      {kategori:'Mahasiswa',penilaian:{keramahan:4,kecepatan:4,kebersihan:3,kualitasMedis:4},rataRata:'3.75'},
+      {kategori:'Mahasiswa',penilaian:{keramahan:3,kecepatan:3,kebersihan:4,kualitasMedis:3},rataRata:'3.25'},
+      {kategori:'Mahasiswa',penilaian:{keramahan:5,kecepatan:4,kebersihan:5,kualitasMedis:5},rataRata:'4.75'},
+      {kategori:'Mahasiswa',penilaian:{keramahan:4,kecepatan:5,kebersihan:4,kualitasMedis:4},rataRata:'4.25'},
+      {kategori:'Dosen',    penilaian:{keramahan:5,kecepatan:4,kebersihan:5,kualitasMedis:5},rataRata:'4.75'},
+      {kategori:'Dosen',    penilaian:{keramahan:4,kecepatan:4,kebersihan:4,kualitasMedis:4},rataRata:'4.00'},
+      {kategori:'Dosen',    penilaian:{keramahan:5,kecepatan:5,kebersihan:5,kualitasMedis:4},rataRata:'4.75'},
+      {kategori:'Dosen',    penilaian:{keramahan:3,kecepatan:3,kebersihan:4,kualitasMedis:4},rataRata:'3.50'},
+      {kategori:'Karyawan', penilaian:{keramahan:4,kecepatan:4,kebersihan:4,kualitasMedis:4},rataRata:'4.00'},
+      {kategori:'Karyawan', penilaian:{keramahan:5,kecepatan:3,kebersihan:5,kualitasMedis:4},rataRata:'4.25'},
+      {kategori:'Karyawan', penilaian:{keramahan:4,kecepatan:4,kebersihan:5,kualitasMedis:5},rataRata:'4.50'},
+      {kategori:'Umum',     penilaian:{keramahan:5,kecepatan:4,kebersihan:4,kualitasMedis:4},rataRata:'4.25'},
+      {kategori:'Umum',     penilaian:{keramahan:4,kecepatan:3,kebersihan:4,kualitasMedis:3},rataRata:'3.50'},
+      {kategori:'Umum',     penilaian:{keramahan:5,kecepatan:5,kebersihan:5,kualitasMedis:5},rataRata:'5.00'},
+      {kategori:'Umum',     penilaian:{keramahan:3,kecepatan:4,kebersihan:3,kualitasMedis:4},rataRata:'3.50'},
+      {kategori:'Umum',     penilaian:{keramahan:4,kecepatan:4,kebersihan:4,kualitasMedis:5},rataRata:'4.25'},
+    ];
+
+    function getRealSurveys(){ return JSON.parse(localStorage.getItem('uns_surveys')||'[]'); }
+    function getMerged(katFilter){
+      let m = [...DUMMY, ...getRealSurveys()];
+      if(katFilter) m = m.filter(s=>s.kategori===katFilter);
+      return m;
+    }
+
+    /* ══════════════════════════════════
+       STATISTIK — FIX: Number() konversi
+    ══════════════════════════════════ */
+    function renderStats(){
+      const all = getMerged('');                       // selalu semua data
+      const n   = all.length;
+      /* FIX: pastikan setiap nilai dikonversi ke Number sebelum reduce */
+      const avgs = all.map(s => Number(s.rataRata));
+      const avg  = n ? (avgs.reduce((a,b)=>a+b, 0) / n).toFixed(2) : '–';
+      const pct  = n ? Math.round(all.filter(s=>Number(s.rataRata)>=4).length / n * 100) + '%' : '–';
+
+      document.getElementById('stat-total').textContent     = n;
+      document.getElementById('stat-avg').textContent       = avg;
+      document.getElementById('stat-satisfied').textContent = pct;
+
+      const kats   = ['Mahasiswa','Dosen','Karyawan','Umum'];
+      const colors = {Mahasiswa:'#3b82f6',Dosen:'#16a34a',Karyawan:'#ca8a04',Umum:'#9333ea'};
+      const counts = {};
+      kats.forEach(k=>{ counts[k] = all.filter(s=>s.kategori===k).length; });
+      const maxC   = Math.max(...Object.values(counts), 1);
+      document.getElementById('kat-bars').innerHTML = kats.filter(k=>counts[k]>0).map(k=>`
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-gray-500 font-medium w-20 flex-shrink-0">${k}</span>
+          <div class="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+            <div class="kat-bar-fill" style="width:${(counts[k]/maxC)*100}%;background:${colors[k]};"></div>
+          </div>
+          <span class="text-xs font-bold text-gray-500 w-5 text-right">${counts[k]}</span>
+        </div>`).join('');
+    }
+
+    /* ══════════════════════════════════
+       TABEL PER ASPEK — FIX: Number()
+    ══════════════════════════════════ */
+    const ASPEK = [
+      {key:'keramahan',    label:'😊 Keramahan Petugas',        desc:'Sikap ramah & sopan staf'},
+      {key:'kecepatan',    label:'⏳ Kecepatan Pelayanan',       desc:'Waktu tunggu & ketepatan'},
+      {key:'kebersihan',   label:'🏥 Kebersihan Fasilitas',      desc:'Ruangan & lingkungan klinik'},
+      {key:'kualitasMedis',label:'💊 Kualitas Penanganan Medis', desc:'Diagnosis & konsultasi dokter'},
+    ];
+
+    function scoreColor(v){ return v>=4.5?'#22c55e':v>=3.5?'#3b82f6':v>=2.5?'#f59e0b':'#ef4444'; }
+    function scoreBg(v)   { return v>=4.5?'#dcfce7':v>=3.5?'#dbeafe':v>=2.5?'#fef3c7':'#fee2e2'; }
+    function scoreLabel(v){ return v>=4.5?'Sangat Baik':v>=3.5?'Baik':v>=2.5?'Cukup':'Perlu Perbaikan'; }
+
+    function renderTable(){
+      const filterKat = document.getElementById('filter-kat').value;
+      const data      = getMerged(filterKat);
+      const totalAll  = getMerged('').length;
+
+      document.getElementById('tabel-subtitle').textContent = filterKat
+        ? `Filter: ${filterKat} · ${data.length} responden`
+        : `${totalAll} responden (${getRealSurveys().length} data baru + ${DUMMY.length} historis)`;
+
+      renderStats();
+
+      const tbody = document.getElementById('rekap-tbody');
+      const empty = document.getElementById('empty-state');
+      if(!data.length){ tbody.innerHTML=''; empty.classList.remove('hidden'); return; }
+      empty.classList.add('hidden');
+
+      tbody.innerHTML = ASPEK.map((a, idx)=>{
+        /* FIX: Number() pada tiap nilai aspek */
+        const vals = data.map(s=>Number((s.penilaian||{})[a.key])).filter(v=>!isNaN(v)&&v>0);
+        const n    = vals.length;
+        if(!n) return '';
+        const avg  = vals.reduce((x,y)=>x+y, 0) / n;   // Number sum, no string bug
+        const avgFmt = avg.toFixed(2);
+
+        const dist      = [1,2,3,4,5].map(sc=>vals.filter(v=>v===sc).length);
+        const maxD      = Math.max(...dist, 1);
+        const barColors = ['#ef4444','#f97316','#f59e0b','#3b82f6','#22c55e'];
+        const distBars  = dist.map((cnt,i)=>`
+          <div style="display:flex;align-items:center;gap:4px;" title="Nilai ${i+1}: ${cnt}">
+            <span style="font-size:.65rem;color:#94a3b8;width:10px;text-align:right;">${i+1}</span>
+            <div style="height:9px;border-radius:99px;flex-shrink:0;background:${barColors[i]};width:${Math.max((cnt/maxD)*72, cnt>0?5:0)}px;min-width:${cnt>0?3:0}px;"></div>
+            ${cnt>0?`<span style="font-size:.65rem;color:#94a3b8;">${cnt}</span>`:''}
+          </div>`).join('');
+
+        const bg = idx%2===0?'#ffffff':'#f8faff';
+        return `<tr style="background:${bg};">
+          <td style="padding:11px 16px;border-bottom:1px solid #f1f5f9;">
+            <div style="font-weight:700;font-size:.85rem;color:#1e293b;">${a.label}</div>
+            <div style="font-size:.72rem;color:#94a3b8;margin-top:2px;">${a.desc}</div>
+          </td>
+          <td style="padding:11px 12px;border-bottom:1px solid #f1f5f9;text-align:center;vertical-align:middle;">
+            <span style="background:${scoreBg(avg)};color:${scoreColor(avg)};border-radius:999px;padding:3px 11px;font-weight:800;font-size:.82rem;display:inline-block;">${avgFmt}</span>
+            <div style="font-size:.65rem;color:${scoreColor(avg)};font-weight:600;margin-top:3px;">${scoreLabel(avg)}</div>
+          </td>
+          <td style="padding:11px 12px;border-bottom:1px solid #f1f5f9;text-align:center;color:#64748b;font-weight:700;font-size:.82rem;vertical-align:middle;">${n}</td>
+          <td style="padding:11px 16px;border-bottom:1px solid #f1f5f9;vertical-align:middle;">
+            <div style="display:flex;flex-direction:column;gap:3px;">${distBars}</div>
+          </td>
+        </tr>`;
+      }).join('');
+
+      /* hapus border baris terakhir */
+      const rows = tbody.querySelectorAll('tr');
+      if(rows.length) rows[rows.length-1].querySelectorAll('td').forEach(td=>td.style.borderBottom='none');
+    }
+
+    /* Init */
+    buildPoliSlider();
+    renderTable();
+
+    function startSurvey(){ window.location.href='survei.html'; }
+    function openLogout(){  document.getElementById('logout-modal').classList.add('show'); }
+    function closeLogout(){ document.getElementById('logout-modal').classList.remove('show'); }
+    function confirmLogout(){ localStorage.removeItem('uns_active_user'); window.location.href='login.html'; }
+  </script>
+</body>
+</html>

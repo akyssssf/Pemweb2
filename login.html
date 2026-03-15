@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login — UNS Medical Center</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *{font-family:'Plus Jakarta Sans',sans-serif;box-sizing:border-box;}
+    body{background:linear-gradient(135deg,#dbeafe 0%,#e0f2fe 50%,#f0fdf4 100%);min-height:100vh;overflow-x:hidden;}
+    .blob{position:fixed;border-radius:50%;filter:blur(60px);pointer-events:none;z-index:0;}
+
+    /* ── Clay Core ── */
+    .clay-card{background:#fff;border-radius:28px;
+      box-shadow:8px 8px 24px rgba(99,149,210,.22),-2px -2px 8px rgba(255,255,255,.9),
+        inset 3px 3px 8px rgba(255,255,255,.85),inset -3px -3px 8px rgba(180,210,245,.35);
+      border:1.5px solid rgba(255,255,255,.75);}
+    .clay-btn{border-radius:16px;font-weight:700;letter-spacing:.3px;border:none;cursor:pointer;
+      box-shadow:5px 5px 14px rgba(59,130,246,.35),-1px -1px 5px rgba(255,255,255,.7),
+        inset 2px 2px 5px rgba(255,255,255,.4),inset -2px -2px 5px rgba(37,99,235,.25);
+      transition:all .18s ease;}
+    .clay-btn:hover{transform:translateY(-2px) scale(1.01);}
+    .clay-btn:active{transform:translateY(0) scale(.98);}
+    .clay-input{background:#f1f8ff;border:1.5px solid rgba(147,197,253,.6);border-radius:14px;
+      box-shadow:inset 2px 2px 6px rgba(180,210,245,.4),inset -2px -2px 5px rgba(255,255,255,.85);
+      outline:none;width:100%;padding:.75rem 1rem;font-size:.95rem;color:#1e293b;
+      transition:border-color .2s,box-shadow .2s;}
+    .clay-input:focus{border-color:rgba(59,130,246,.6);
+      box-shadow:inset 2px 2px 6px rgba(147,197,253,.5),inset -2px -2px 5px rgba(255,255,255,.9),0 0 0 3px rgba(59,130,246,.12);}
+
+    /* ── Input ── */
+    .input-wrap{position:relative;}
+    .eye-btn{position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;
+      cursor:pointer;color:#94a3b8;padding:4px;transition:color .15s;line-height:1;}
+    .eye-btn:hover{color:#3b82f6;}
+
+    /* ── Tab ── */
+    .tab-track{background:#f1f5f9;border-radius:14px;padding:4px;display:flex;gap:4px;position:relative;margin-bottom:1.25rem;}
+    .tab-slider{position:absolute;top:4px;bottom:4px;border-radius:10px;
+      background:linear-gradient(135deg,#3b82f6,#2563eb);
+      box-shadow:3px 3px 10px rgba(59,130,246,.35),inset 1px 1px 4px rgba(255,255,255,.3);
+      transition:left .28s cubic-bezier(.34,1.2,.64,1), width .28s cubic-bezier(.34,1.2,.64,1);}
+    .tab-btn{flex:1;padding:.65rem;font-size:.875rem;font-weight:700;border:none;background:transparent;
+      cursor:pointer;border-radius:10px;position:relative;z-index:1;transition:color .2s;white-space:nowrap;}
+    .tab-btn.active{color:#fff;}
+    .tab-btn.inactive{color:#64748b;}
+    .tab-btn.inactive:hover{color:#334155;}
+
+    /* ── Form transition wrapper ── */
+    .form-wrap{position:relative;overflow:hidden;}
+    .form-slide{transition:opacity .25s ease, transform .25s ease;}
+    .form-slide.out-left{opacity:0;transform:translateX(-24px);pointer-events:none;position:absolute;top:0;left:0;right:0;}
+    .form-slide.out-right{opacity:0;transform:translateX(24px);pointer-events:none;position:absolute;top:0;left:0;right:0;}
+    .form-slide.in{opacity:1;transform:translateX(0);}
+
+    /* ── Left panel ── */
+    .left-panel{background:linear-gradient(145deg,#1e3a6e 0%,#1e40af 50%,#1d4ed8 100%);}
+
+    /* ── FIX: Mobile logo — logo UNS putih di bg putih → pakai bg biru pill ── */
+    .mobile-logo-wrap{
+      display:flex;align-items:center;gap:10px;margin-bottom:1.5rem;
+      background:linear-gradient(135deg,#1e40af,#1d4ed8);
+      border-radius:16px;padding:10px 14px;
+    }
+    .mobile-logo-wrap span{font-weight:800;color:#fff;font-size:.9rem;line-height:1.2;}
+    .mobile-logo-wrap small{color:rgba(255,255,255,.7);font-size:.7rem;font-weight:500;display:block;}
+
+    /* ── Alerts ── */
+    .alert-error{background:#fef2f2;border:1.5px solid rgba(252,165,165,.6);border-radius:12px;color:#dc2626;padding:.6rem 1rem;font-size:.85rem;}
+    .alert-success{background:#f0fdf4;border:1.5px solid rgba(134,239,172,.6);border-radius:12px;color:#16a34a;padding:.6rem 1rem;font-size:.85rem;}
+
+    /* ── Animations ── */
+    @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+    .fade-up{animation:fadeUp .45s ease both;}
+
+    /* ── Social btns ── */
+    .social-btn{width:100%;padding:.7rem;border-radius:14px;font-size:.875rem;font-weight:600;
+      display:flex;align-items:center;justify-content:center;gap:10px;cursor:pointer;
+      border:1.5px solid;transition:all .18s ease;}
+    .social-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.1);}
+    .google-btn{background:#fff;border-color:#e2e8f0;color:#374151;
+      box-shadow:2px 2px 8px rgba(0,0,0,.06),inset 1px 1px 4px rgba(255,255,255,.9);}
+    .wa-btn{background:#f0fdf4;border-color:#bbf7d0;color:#15803d;
+      box-shadow:2px 2px 8px rgba(21,128,61,.08),inset 1px 1px 4px rgba(255,255,255,.9);}
+
+    /* ── Divider ── */
+    .divider{display:flex;align-items:center;gap:10px;margin:.9rem 0;}
+    .divider::before,.divider::after{content:'';flex:1;height:1px;background:linear-gradient(90deg,transparent,#e2e8f0,transparent);}
+    .divider span{font-size:.72rem;color:#94a3b8;font-weight:600;white-space:nowrap;}
+
+    /* ── Feat pills (panel kiri) ── */
+    .feat-pill{display:inline-flex;align-items:center;gap:6px;
+      background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.22);
+      border-radius:999px;padding:6px 14px;font-size:.78rem;font-weight:600;color:rgba(255,255,255,.9);}
+
+    /* ── Strength bar ── */
+    label{font-size:.83rem;font-weight:600;color:#374151;margin-bottom:4px;display:block;}
+
+    /* ── FIX: Modal overlay — HANYA pakai JS style, tidak ada class hidden ── */
+    .modal-overlay-custom{
+      position:fixed;inset:0;z-index:999;
+      background:rgba(0,0,0,.35);backdrop-filter:blur(7px);
+      display:none;/* JS akan set flex */
+      align-items:center;justify-content:center;padding:1rem;
+    }
+    @keyframes popIn{from{opacity:0;transform:scale(.82)}to{opacity:1;transform:scale(1)}}
+    .pop-in{animation:popIn .3s cubic-bezier(.34,1.56,.64,1) both;}
+
+    /* ── Mobile responsive fixes ── */
+    @media(max-width:1023px){
+      /* Card full rounded di mobile */
+      .form-card{border-radius:28px !important;}
+      /* Padding lebih kecil di mobile */
+      .form-pad{padding:1.5rem !important;}
+    }
+    @media(max-width:420px){
+      .form-pad{padding:1.25rem !important;}
+      .clay-input{font-size:.875rem;}
+      .tab-btn{font-size:.8rem;padding:.55rem;}
+    }
+  </style>
+</head>
+<body class="flex items-center justify-center min-h-screen px-3 py-8 relative overflow-x-hidden">
+
+  <!-- Blobs dekoratif -->
+  <div class="blob w-72 h-72 bg-blue-200 opacity-40" style="top:-5rem;left:-5rem;"></div>
+  <div class="blob w-96 h-96 bg-cyan-200 opacity-25" style="bottom:-5rem;right:-5rem;"></div>
+  <div class="blob w-48 h-48 bg-green-200 opacity-20" style="top:45%;left:52%;"></div>
+
+  <!-- ══ WRAPPER ══ -->
+  <div class="relative z-10 w-full max-w-4xl flex flex-col lg:flex-row fade-up overflow-hidden rounded-[28px] lg:rounded-[32px]"
+       style="box-shadow:0 20px 70px rgba(30,58,138,.22)">
+
+    <!-- LEFT PANEL (desktop only) -->
+    <div class="left-panel hidden lg:flex flex-col justify-between p-10 w-80 flex-shrink-0">
+      <!-- Logo putih di panel gelap — aman -->
+      <div class="flex items-center gap-3">
+        <img src="https://senirupa.fkip.uns.ac.id/wp-content/uploads/2021/07/logo_putih.png"
+             alt="Logo UNS" class="h-10 object-contain"
+             onerror="this.style.display='none'"/>
+        <div>
+          <p class="font-extrabold text-white text-sm leading-tight">UNS Medical Center</p>
+          <p class="text-blue-200 text-xs font-medium">Survei Kepuasan Pasien</p>
+        </div>
+      </div>
+
+      <!-- Storyset: Doctors – Pana -->
+      <div class="my-4 flex justify-center">
+        <img src="https://stories.freepiklabs.com/storage/4688/Doctors-01.svg"
+             alt="Ilustrasi dokter" class="w-56 h-56 object-contain drop-shadow-lg"/>
+      </div>
+
+      <div>
+        <h2 class="font-extrabold text-white text-xl leading-tight mb-2">Bantu Kami Melayani<br/>Lebih Baik 💙</h2>
+        <p class="text-blue-200 text-xs leading-6 mb-4">Isi survei kepuasan dan bantu UNS Medical Center terus berkembang untuk sivitas UNS.</p>
+        <div class="flex flex-col gap-2">
+          <span class="feat-pill">🏥 8 Poli Layanan Lengkap</span>
+          <span class="feat-pill">👨‍⚕️ Dokter Berpengalaman</span>
+          <span class="feat-pill">⭐ Rating 4.7 / 5.0</span>
+          <span class="feat-pill">🔒 Data Aman &amp; Anonim</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT FORM -->
+    <div class="clay-card form-card flex-1 form-pad" style="padding:2rem;border-radius:0 32px 32px 0;">
+
+      <!-- FIX: Mobile logo — background biru agar logo putih terlihat -->
+      <div class="mobile-logo-wrap lg:hidden">
+        <img src="https://senirupa.fkip.uns.ac.id/wp-content/uploads/2021/07/logo_putih.png"
+             alt="Logo UNS" class="h-8 object-contain flex-shrink-0"
+             onerror="this.style.display='none'"/>
+        <div>
+          <span>UNS Medical Center</span>
+          <small>Survei Kepuasan Pasien</small>
+        </div>
+      </div>
+
+      <h1 class="font-extrabold text-gray-800 text-xl sm:text-2xl mb-1">Selamat Datang 👋</h1>
+      <p class="text-gray-400 text-sm mb-5">Masuk atau buat akun untuk mengisi survei kepuasan pasien.</p>
+
+      <!-- ── TAB SLIDER (FIX: animasi smooth) ── -->
+      <div class="tab-track" id="tab-track">
+        <div class="tab-slider" id="tab-slider"></div>
+        <button class="tab-btn active" id="tab-login" onclick="switchTab('login')" aria-label="Tab Masuk">Masuk</button>
+        <button class="tab-btn inactive" id="tab-register" onclick="switchTab('register')" aria-label="Tab Daftar">Daftar</button>
+      </div>
+
+      <!-- Alert -->
+      <div id="alert-box" style="display:none;margin-bottom:1rem;"></div>
+
+      <!-- Social buttons -->
+      <div id="social-btns">
+        <button type="button" class="social-btn google-btn mb-2" onclick="handleSocialLogin('google')" aria-label="Masuk dengan Google">
+          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.2H42V20H24v8h11.3C33.7 32.7 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34 6.6 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.6-.4-3.8z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16.1 19 13 24 13c3.1 0 5.8 1.1 7.9 3l5.7-5.7C34 6.6 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.4 35.5 26.8 36.5 24 36.5c-5.3 0-9.7-3.3-11.3-8l-6.6 5.1C9.7 39.7 16.3 44 24 44z"/><path fill="#1976D2" d="M43.6 20.2H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.4 5.7l6.2 5.2C41 35.3 44 30 44 24c0-1.3-.1-2.6-.4-3.8z"/></svg>
+          Masuk dengan Google
+        </button>
+        <button type="button" class="social-btn wa-btn" onclick="handleSocialLogin('whatsapp')" aria-label="Masuk dengan WhatsApp">
+          <svg width="18" height="18" viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#25D366"/><path d="M23.5 8.5C21.7 6.7 19.4 5.6 16.9 5.5 11.8 5.3 7.5 9.5 7.5 14.6c0 1.6.4 3.2 1.2 4.6L7.3 24l5-1.3c1.3.7 2.8 1.1 4.3 1.1h.1c5.1 0 9.3-4.1 9.3-9.2 0-2.5-.9-4.8-2.5-6.1zm-6.6 14.1h-.1c-1.3 0-2.6-.4-3.7-1l-.3-.2-2.9.8.8-2.8-.2-.3c-.7-1.1-1.1-2.4-1.1-3.7 0-3.9 3.2-7.1 7.1-7.1 1.9 0 3.7.7 5 2.1 1.3 1.3 2.1 3.1 2.1 5-.1 3.9-3.2 7.2-7.7 7.2zm3.9-5.3c-.2-.1-1.3-.6-1.5-.7-.2-.1-.3-.1-.5.1-.1.2-.6.7-.7.9-.1.1-.3.2-.5.1-.2-.1-1-.4-1.9-1.2-.7-.6-1.2-1.4-1.3-1.6-.1-.2 0-.4.1-.5l.3-.4c.1-.1.1-.2.2-.4.1-.1 0-.3 0-.4-.1-.1-.5-1.2-.7-1.6-.2-.4-.4-.3-.5-.3h-.4c-.1 0-.4.1-.6.2-.2.2-.7.7-.7 1.7s.7 2 .8 2.1c.1.1 1.4 2.1 3.4 3 .5.2.9.3 1.2.4.5.2 1 .1 1.4.1.4-.1 1.3-.5 1.5-1 .2-.5.2-.9.1-1-.1-.1-.2-.1-.4-.2z" fill="white"/></svg>
+          Masuk dengan WhatsApp
+        </button>
+        <div class="divider"><span>atau dengan email</span></div>
+      </div>
+
+      <!-- ── Form wrapper dengan animasi slide ── -->
+      <div class="form-wrap" id="form-wrap">
+
+        <!-- LOGIN FORM -->
+        <form id="form-login" class="form-slide in space-y-4" onsubmit="handleLogin(event)" autocomplete="on">
+          <div>
+            <label for="login-email">Email</label>
+            <input id="login-email" type="email" class="clay-input" placeholder="nama@email.com"
+                   autocomplete="email" required aria-label="Email"/>
+          </div>
+          <div>
+            <label for="login-password">Password</label>
+            <div class="input-wrap">
+              <input id="login-password" type="password" class="clay-input" style="padding-right:2.75rem"
+                     placeholder="••••••••" autocomplete="current-password" required aria-label="Password"/>
+              <button type="button" class="eye-btn" onclick="togglePwd('login-password',this)" aria-label="Tampilkan password">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+          </div>
+          <button type="submit" class="clay-btn w-full py-3.5 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm">
+            Masuk ke Sistem →
+          </button>
+          <p class="text-center text-xs text-gray-400">Belum punya akun?
+            <button type="button" onclick="switchTab('register')" class="text-blue-500 font-semibold hover:underline">Daftar sekarang</button>
+          </p>
+        </form>
+
+        <!-- REGISTER FORM -->
+        <form id="form-register" class="form-slide out-right space-y-4" onsubmit="handleRegister(event)" autocomplete="on">
+          <div>
+            <label for="reg-name">Nama Lengkap</label>
+            <input id="reg-name" type="text" class="clay-input" placeholder="Nama lengkap Anda"
+                   autocomplete="name" required aria-label="Nama Lengkap"/>
+          </div>
+          <div>
+            <label for="reg-email">Email</label>
+            <input id="reg-email" type="email" class="clay-input" placeholder="nama@email.com"
+                   autocomplete="email" required aria-label="Email"/>
+          </div>
+          <div>
+            <label for="reg-password">Password</label>
+            <div class="input-wrap">
+              <input id="reg-password" type="password" class="clay-input" style="padding-right:2.75rem"
+                     placeholder="Min. 6 karakter" minlength="6" autocomplete="new-password"
+                     required oninput="checkStrength(this.value)" aria-label="Password baru"/>
+              <button type="button" class="eye-btn" onclick="togglePwd('reg-password',this)" aria-label="Tampilkan password">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              </button>
+            </div>
+            <!-- Strength meter -->
+            <div class="mt-2 flex gap-1.5">
+              <div class="flex-1 h-1.5 rounded-full bg-gray-200 overflow-hidden"><div id="s1" class="h-full w-0 rounded-full transition-all duration-300"></div></div>
+              <div class="flex-1 h-1.5 rounded-full bg-gray-200 overflow-hidden"><div id="s2" class="h-full w-0 rounded-full transition-all duration-300"></div></div>
+              <div class="flex-1 h-1.5 rounded-full bg-gray-200 overflow-hidden"><div id="s3" class="h-full w-0 rounded-full transition-all duration-300"></div></div>
+            </div>
+            <p id="str-label" class="text-xs text-gray-400 mt-1" aria-live="polite"></p>
+          </div>
+          <button type="submit" class="clay-btn w-full py-3.5 bg-gradient-to-r from-cyan-500 to-blue-500 text-white text-sm">
+            Buat Akun Sekarang 🚀
+          </button>
+          <p class="text-center text-xs text-gray-400">Sudah punya akun?
+            <button type="button" onclick="switchTab('login')" class="text-blue-500 font-semibold hover:underline">Masuk di sini</button>
+          </p>
+        </form>
+
+      </div><!-- end form-wrap -->
+    </div><!-- end right form -->
+  </div>
+
+  <!-- ── FIX: Social Modal — TIDAK pakai class hidden, hanya inline style ── -->
+  <div id="social-modal" class="modal-overlay-custom" role="dialog" aria-modal="true">
+    <div class="clay-card p-7 max-w-xs w-full mx-4 text-center pop-in">
+      <div id="social-modal-icon" class="text-5xl mb-3"></div>
+      <h3 class="font-extrabold text-gray-800 text-lg mb-1" id="social-modal-title"></h3>
+      <p class="text-gray-500 text-sm leading-6 mb-5" id="social-modal-desc"></p>
+      <button onclick="closeSocialModal()" class="clay-btn w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white text-sm">
+        Mengerti
+      </button>
+    </div>
+  </div>
+
+  <script>
+    if(localStorage.getItem('uns_active_user')) window.location.href='index.html';
+
+    /* ── Tab slider logic ── */
+    let currentTab = 'login';
+
+    function positionSlider(tab){
+      const track = document.getElementById('tab-track');
+      const btnLogin = document.getElementById('tab-login');
+      const btnReg = document.getElementById('tab-register');
+      const slider = document.getElementById('tab-slider');
+      const activeBtn = tab==='login' ? btnLogin : btnReg;
+      const trackRect = track.getBoundingClientRect();
+      const btnRect = activeBtn.getBoundingClientRect();
+      slider.style.left = (btnRect.left - trackRect.left) + 'px';
+      slider.style.width = btnRect.width + 'px';
+    }
+
+    function switchTab(tab){
+      if(tab === currentTab) return;
+      const wasLogin = currentTab === 'login';
+      currentTab = tab;
+
+      const btnLogin = document.getElementById('tab-login');
+      const btnReg   = document.getElementById('tab-register');
+      const formLogin = document.getElementById('form-login');
+      const formReg   = document.getElementById('form-register');
+
+      /* Update slider */
+      positionSlider(tab);
+
+      /* Update tab button classes */
+      btnLogin.className  = 'tab-btn ' + (tab==='login'  ? 'active' : 'inactive');
+      btnReg.className    = 'tab-btn ' + (tab==='register' ? 'active' : 'inactive');
+
+      /* Animate forms: current slides out, next slides in */
+      const outDir  = wasLogin ? 'out-left' : 'out-right';
+      const inForm  = tab==='login' ? formLogin : formReg;
+      const outForm = tab==='login' ? formReg   : formLogin;
+
+      /* Set wrapper height to outgoing form height so no jump */
+      const wrap = document.getElementById('form-wrap');
+      wrap.style.height = outForm.offsetHeight + 'px';
+
+      outForm.classList.remove('in');
+      outForm.classList.add(wasLogin ? 'out-left' : 'out-right');
+
+      inForm.classList.remove('out-left','out-right');
+      /* small delay so browser paints the out-state first */
+      requestAnimationFrame(()=>{
+        requestAnimationFrame(()=>{
+          inForm.classList.add('in');
+          /* animate wrapper to new height */
+          wrap.style.height = inForm.scrollHeight + 'px';
+          setTimeout(()=>{ wrap.style.height=''; }, 280);
+        });
+      });
+
+      clearAlert();
+    }
+
+    /* Init slider position on load */
+    window.addEventListener('load', ()=> positionSlider('login'));
+    window.addEventListener('resize', ()=> positionSlider(currentTab));
+
+    /* ── Alert ── */
+    function showAlert(msg, type='error'){
+      const b = document.getElementById('alert-box');
+      b.className = type==='error' ? 'alert-error' : 'alert-success';
+      b.textContent = msg;
+      b.style.display = 'block';
+      b.style.marginBottom = '1rem';
+    }
+    function clearAlert(){
+      const b = document.getElementById('alert-box');
+      b.style.display = 'none';
+      b.textContent = '';
+    }
+
+    /* ── Password toggle ── */
+    function togglePwd(id, btn){
+      const inp = document.getElementById(id);
+      const show = inp.type === 'password';
+      inp.type = show ? 'text' : 'password';
+      btn.style.color = show ? '#3b82f6' : '#94a3b8';
+      btn.setAttribute('aria-label', show ? 'Sembunyikan password' : 'Tampilkan password');
+    }
+
+    /* ── Strength meter ── */
+    function checkStrength(v){
+      const score = (v.length>=6?1:0) + (v.length>=10&&/\d/.test(v)?1:0) + (/[^a-zA-Z0-9]/.test(v)?1:0);
+      const cols = ['#ef4444','#f97316','#22c55e'];
+      ['s1','s2','s3'].forEach((id,i)=>{
+        const el = document.getElementById(id);
+        el.style.width = i<score ? '100%' : '0';
+        el.style.background = score>0 ? cols[score-1] : '';
+      });
+      const lbl = document.getElementById('str-label');
+      lbl.textContent = score>0 ? 'Kekuatan: '+['Lemah','Sedang','Kuat'][score-1] : '';
+      lbl.style.color = score>0 ? cols[score-1] : '#9ca3af';
+    }
+
+    /* ── Auth ── */
+    function getUsers(){ return JSON.parse(localStorage.getItem('uns_users')||'[]'); }
+
+    function handleRegister(e){
+      e.preventDefault();
+      const name     = document.getElementById('reg-name').value.trim();
+      const email    = document.getElementById('reg-email').value.trim().toLowerCase();
+      const password = document.getElementById('reg-password').value;
+      const users    = getUsers();
+      if(users.find(u=>u.email===email)){ showAlert('Email sudah terdaftar.'); return; }
+      users.push({name,email,password});
+      localStorage.setItem('uns_users',JSON.stringify(users));
+      showAlert('Akun berhasil dibuat! Silakan masuk.','success');
+      e.target.reset(); checkStrength('');
+      setTimeout(()=>switchTab('login'), 1300);
+    }
+
+    function handleLogin(e){
+      e.preventDefault();
+      const email    = document.getElementById('login-email').value.trim().toLowerCase();
+      const password = document.getElementById('login-password').value;
+      const user     = getUsers().find(u=>u.email===email && u.password===password);
+      if(!user){ showAlert('Email atau password salah.'); return; }
+      localStorage.setItem('uns_active_user',JSON.stringify({name:user.name,email:user.email}));
+      window.location.href='index.html';
+    }
+
+    /* ── FIX: Social modal — hanya pakai style.display, tanpa class hidden ── */
+    function handleSocialLogin(type){
+      const cfg = type==='google'
+        ? { icon:'🔗', title:'Login Google',
+            desc:'Fitur login Google memerlukan integrasi OAuth 2.0 di server. Untuk demo ini, gunakan form email di bawah.' }
+        : { icon:'📱', title:'Login via WhatsApp',
+            desc:'Fitur OTP WhatsApp memerlukan integrasi API WA Business. Untuk demo ini, gunakan form email di bawah.' };
+      document.getElementById('social-modal-icon').textContent  = cfg.icon;
+      document.getElementById('social-modal-title').textContent = cfg.title;
+      document.getElementById('social-modal-desc').textContent  = cfg.desc;
+      document.getElementById('social-modal').style.display = 'flex';
+    }
+    function closeSocialModal(){
+      document.getElementById('social-modal').style.display = 'none';
+    }
+    /* Tutup modal kalau klik backdrop */
+    document.getElementById('social-modal').addEventListener('click', function(e){
+      if(e.target === this) closeSocialModal();
+    });
+  </script>
+</body>
+</html>
